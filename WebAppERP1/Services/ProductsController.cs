@@ -76,6 +76,7 @@ namespace WebAppERP1.Services
         }
 
         // GET api/<controller>
+        [HttpGet]
         public List<Product> Get()
         {
             List<Product> products = new List<Product>();
@@ -124,10 +125,39 @@ namespace WebAppERP1.Services
         // GET api/<controller>/5
         public Product Get(int id)
         {
-            return new Product();
+
+            try
+            {
+                //create a query for retrieving data in the database.
+                query = $"SELECT Id, ExternalId, Code, Description, [Name], Barcode, RetailPrice, WholesalePrice, Discount FROM PRODUCTS where ID = {id} ;";
+
+                _cmd.Connection = _conn;
+                _cmd.CommandText = query;
+                _da.SelectCommand = _cmd;
+                _da.Fill(_dt);
+
+                return new Product
+                {
+                    Id = _dt.Rows[0].Field<long>("Id"),
+                    ExternalId = _dt.Rows[0].Field<string>("ExternalId"),
+                    Code = _dt.Rows[0].Field<string>("Code"),
+                    Description = _dt.Rows[0].Field<string>("Description"),
+                    Name = _dt.Rows[0].Field<string>("Name"),
+                    Barcode = _dt.Rows[0].Field<string>("Barcode"),
+                    RetailPrice = _dt.Rows[0].Field<string>("RetailPrice"),
+                    WholesalePrice = _dt.Rows[0].Field<string>("WholesalePrice"),
+                    Discount = _dt.Rows[0].Field<string>("Discount"),
+                }; //we assume that id is unique, and only one row will be returned, so we take the data of the first row of Data Table
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         // POST api/<controller>
+        [HttpPost]
         public void Post([FromBody]List<Product> products)
         {            
             SqlTransaction _transaction = null;
@@ -207,6 +237,7 @@ namespace WebAppERP1.Services
         }
 
         // PUT api/<controller>/5
+        [HttpPut]
         public void Put(long id, [FromBody]Product product)
         {
             try
@@ -248,6 +279,7 @@ namespace WebAppERP1.Services
         }
 
         // DELETE api/<controller>/5
+        [HttpDelete]
         public void Delete(long id)
         {
             try
